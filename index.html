@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+<!-- This site is hosted on Netlify. Anyone can build and deploy a site
+     like this one for free: https://netlify.new/?utm_campaign=loops&utm_source=ai-legible&utm_medium=owned&utm_content=comment&utm_id=61966f29-f927-4c83-bd09-942ef02ad7fd
+     Netlify hosting facts for this site: static/SSR served via Netlify Edge. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>🚀 RDMex</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
+    
+<meta http-equiv="Content-Security-Policy"
+content="default-src 'self' data: gap:;
+connect-src 'self' https://api.real-debrid.com https://raw.githubusercontent.com https://cloud.umami.is https://gateway.umami.is;
+style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
+font-src 'self' https://cdn.jsdelivr.net;
+script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cloud.umami.is;">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+    
+    <style>
+        #toastContainer { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 90%; max-width: 500px; }
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        #statusLog::-webkit-scrollbar, #torrentList::-webkit-scrollbar, #trackerInput::-webkit-scrollbar { width: 8px; }
+        #statusLog::-webkit-scrollbar-thumb, #torrentList::-webkit-scrollbar-thumb, #trackerInput::-webkit-scrollbar-thumb { background-color: #a0aec0; border-radius: 4px; }
+        #statusLog::-webkit-scrollbar-track, #torrentList::-webkit-scrollbar-track, #trackerInput::-webkit-scrollbar-track { background-color: #edf2f7; }
+        .btn-potplayer { background-color: #4b3279; color: white; } .btn-potplayer:hover { background-color: #5d3f99; }
+        .btn-stream { background-color: #8B5CF6; color: white; } .btn-stream:hover { background-color: #7C3AED; }
+        .btn-rdpage { background-color: #3B82F6; color: white; } .btn-rdpage:hover { background-color: #2563EB; }
+        .btn-download { background-color: #10B981; color: white; } .btn-download:hover { background-color: #059669; }
+        .btn-link { background-color: #6B7280; color: white; } .btn-link:hover { background-color: #4B5563; }
+        .btn-hide { background-color: #9CA3AF; color: white; } .btn-hide:hover { background-color: #6B7280; }
+        .btn-delete { background-color: #EF4444; color: white; } .btn-delete:hover { background-color: #DC2626; }
+        .loading { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    </style>
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="55a026b0-94ff-4331-abac-cf9edd7b9ffc"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-800 text-white p-4 shadow-md flex justify-between items-center sticky top-0 z-40">
+      <div><h1 class="text-2xl font-bold flex items-center"><i class="fas fa-rocket mr-3"></i>RDMex</h1></div>
+      <div id="apiListSize" class="text-right opacity-90 text-xl font-bold"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 md:px-6 py-8 max-w-7xl">
+      
+      <!-- Input Section -->
+      <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+            <!-- Left Input Column -->
+            <div class="flex flex-col gap-4 h-full">
+                <div class="flex-grow flex relative min-h-[128px]">
+                    <div id="magnetPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none transition-opacity duration-300">
+                        <i class="fas fa-magnet text-4xl text-gray-400"></i>
+                        <p class="mt-2 text-sm text-gray-600">마그넷 링크를 여기에 붙여넣으세요</p>
+                    </div>
+                    <textarea id="magnetInput" class="w-full h-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-left bg-transparent z-10"></textarea>
+                </div>
+                <button onclick="handleConvertUpload(this)" id="convertUploadButton" class="w-full px-4 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition duration-200 flex items-center justify-center text-xl">
+                    <i class="fas fa-magnet mr-3"></i> 마그넷 / 변환 업로드
+                </button>
+            </div>
+
+            <!-- Right Input Column -->
+            <div class="flex flex-col gap-4 h-full">
+                <div class="flex-grow border-2 border-dashed border-gray-300 rounded-lg p-4 text-center w-full min-h-[128px] flex flex-col justify-center items-center relative cursor-pointer" id="dropZone">
+                    <input type="file" id="torrentFile" accept=".torrent" class="hidden" />
+                    <div id="dropZoneContent" class="flex flex-col items-center justify-center h-full">
+                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400"></i>
+                        <p class="mt-2 text-sm text-gray-600">.torrent 파일을 드롭하거나 클릭하여 추가</p>
+                    </div>
+                </div>
+                <button onclick="handleDirectUpload(this)" id="directUploadButton" class="w-full px-4 py-3 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition duration-200 flex items-center justify-center text-xl opacity-50 cursor-not-allowed" disabled>
+                    <i class="fas fa-file-arrow-up mr-3"></i> 파일 직접 업로드
+                </button>
+            </div>
+        </div>
+      </div>
+
+      <!-- Main Section -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Left Column: Torrent List -->
+        <div class="bg-white rounded-lg shadow-lg">
+            <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                <h2 class="text-xl font-semibold text-gray-800"><i class="fas fa-list mr-2 text-blue-500"></i>토렌트 목록</h2>
+                <div class="flex gap-2">
+                    <button onclick="refreshTorrents()" class="px-3 py-1 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700" title="새로고침"><i class="fas fa-sync-alt"></i></button>
+                    <button onclick="deleteCompleted()" class="px-3 py-1 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700" title="완료된 항목 모두 삭제"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+            <div id="torrentList" class="p-2" style="min-height: 600px; max-height: 80vh; overflow-y: auto;">
+                <p class="text-gray-500 text-center py-8">토렌트 목록을 불러오려면 새로고침 버튼을 클릭하세요.</p>
+
+                <!-- 
+                  [ 개발자 참고 ]
+                  app.js에서 각 토렌트 항목을 생성할 때 아래와 같은 구조를 사용해주세요.
+                  날짜/시간 관련 div가 완전히 제거되었습니다.
+                -->
+                <!--
+                <div class="border-b py-3 px-2">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-semibold text-gray-800 text-sm break-all pr-2">신발 벗고 돌싱포맨.E205.251021.1080p.H264-F1RST.mp4</h3>
+                        <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full whitespace-nowrap">완료</span>
+                    </div>
+
+                    <div class="flex justify-between items-center text-xs text-gray-500 mb-2">
+                        <div class="flex items-center gap-x-4">
+                            <span><i class="fas fa-hdd mr-1"></i>1.43 GB</span>
+                            <span><i class="fas fa-arrow-down mr-1"></i>0 B/s</span>
+                        </div>
+                    </div>
+
+                    <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                        <div class="bg-blue-600 h-2 rounded-full" style="width: 100%"></div>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-1.5">
+                        <button class="btn-potplayer px-2.5 py-1.5 rounded text-xs"><i class="fas fa-play"></i></button>
+                        <button class="btn-stream px-2.5 py-1.5 rounded text-xs"><i class="fas fa-desktop"></i></button>
+                        <button class="btn-rdpage px-2.5 py-1.5 rounded text-xs"><i class="fas fa-external-link-alt"></i></button>
+                        <button class="btn-download px-2.5 py-1.5 rounded text-xs"><i class="fas fa-download"></i></button>
+                        <button class="btn-link px-2.5 py-1.5 rounded text-xs"><i class="fas fa-link"></i></button>
+                        <button class="btn-hide px-2.5 py-1.5 rounded text-xs"><i class="fas fa-eye-slash"></i></button>
+                        <button class="btn-delete px-2.5 py-1.5 rounded text-xs"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                -->
+            </div>
+        </div>
+
+        <!-- Right Column: Controls -->
+        <div class="flex flex-col gap-8">
+          <!-- Tracker Container -->
+          <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="flex justify-between items-center mb-1 border-b pb-3">
+                <h2 class="text-xl font-semibold flex items-center text-gray-800"><i class="fas fa-satellite-dish mr-2 text-purple-500"></i>트래커</h2>
+                <div id="trackerUpdateTime" class="text-xs font-bold text-gray-500 ml-3 text-right"></div>
+            </div>
+            <div class="flex items-center mt-4 mb-2">
+              <span class="cursor-pointer text-sm font-medium text-gray-700 flex items-center" onclick="fetchBestTrackers()">
+                  <i class="fas fa-sync-alt mr-2 text-purple-500"></i>최신 트래커 불러오기
+              </span>
+              <span id="trackerStatusIcon" class="ml-2"></span>
+            </div>
+            <div class="relative">
+              <textarea id="trackerInput" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="RD 추가 시 마그넷에 적용할 트래커 목록입니다. 최신 목록을 자동으로 불러옵니다..."></textarea>
+            </div>
+          </div>
+
+          <!-- Log Container -->
+          <div class="bg-white rounded-lg shadow-lg p-6 flex flex-col">
+            <h2 class="text-xl font-semibold mb-4 flex items-center text-gray-800 border-b pb-3"><i class="fas fa-info-circle mr-2 text-blue-500"></i>상태 및 로그</h2>
+            <div id="statusLog" class="bg-gray-50 rounded-lg p-3 overflow-y-auto text-sm" style="height: 200px;">
+                <p id="initialLogMessage" class="text-gray-500">준비 완료.</p>
+            </div>
+          </div>
+          
+          <!-- API Container -->
+          <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold flex items-center text-gray-800"><i class="fas fa-key mr-2 text-yellow-500"></i>API 설정</h2>
+                <div id="apiCombinedStatus" class="ml-3 text-sm"></div>
+            </div>
+            <div class="relative">
+                <input type="password" id="apiToken" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10" placeholder="Real-Debrid API 토큰을 입력하세요" />
+                <button id="toggleApiToken" onclick="toggleTokenVisibility()" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-700">
+                    <i id="toggleApiIcon" class="fas fa-eye"></i>
+                </button>
+            </div>
+            <p class="text-xs text-gray-500 mt-2">API 토큰은 <a href="https://real-debrid.com/apitoken" target="_blank" class="text-blue-600 underline">real-debrid.com/apitoken</a> 에서 발급받을 수 있습니다.<br/><span class="text-red-500">연결 실패 시:</span> 토큰이 정확한지, 인터넷 연결, 브라우저 확장 프로그램(광고 차단 등)을 확인해주세요.</p>
+            <div class="flex gap-4 mt-4">
+                <button onclick="saveToken()" class="flex-1 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"><i class="fas fa-save mr-2"></i>저장</button>
+                <button onclick="testConnection()" class="flex-1 px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700"><i class="fas fa-plug mr-2"></i>연결 테스트</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Toast Message Container -->
+    <div id="toastContainer"></div>
+
+    <!-- Local Scripts Loading Section -->
+    <script src="cordova.js"></script>
+    <script src="sha1.js"></script>
+    <script src="bencode.js"></script>
+    <script src="src/base32.js"></script>
+    
+    <!-- Main Application Script -->
+    <script src="app.js"></script>
+    
+    <!-- API Token Visibility Script -->
+    <script>
+        function toggleTokenVisibility() {
+            const apiTokenInput = document.getElementById('apiToken');
+            const toggleIcon = document.getElementById('toggleApiIcon');
+            if (apiTokenInput.type === 'password') {
+                apiTokenInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                apiTokenInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
+</body>
+</html>
