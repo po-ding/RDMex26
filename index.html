@@ -1,212 +1,394 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8" />
+<meta charset="UTF-8" />
 <!-- This site is hosted on Netlify. Anyone can build and deploy a site
      like this one for free: https://netlify.new/?utm_campaign=loops&utm_source=ai-legible&utm_medium=owned&utm_content=comment&utm_id=61966f29-f927-4c83-bd09-942ef02ad7fd
      Netlify hosting facts for this site: static/SSR served via Netlify Edge. -->
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>🚀 RDMex</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
-    
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>🚀 RDMex</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
+
 <meta http-equiv="Content-Security-Policy"
 content="default-src 'self' data: gap:;
+base-uri 'self';
+object-src 'none';
+form-action 'self';
 connect-src 'self' https://api.real-debrid.com https://raw.githubusercontent.com https://cloud.umami.is https://gateway.umami.is;
 style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
 font-src 'self' https://cdn.jsdelivr.net;
-script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cloud.umami.is;">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
-    
-    <style>
-        #toastContainer { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 90%; max-width: 500px; }
-        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        #statusLog::-webkit-scrollbar, #torrentList::-webkit-scrollbar, #trackerInput::-webkit-scrollbar { width: 8px; }
-        #statusLog::-webkit-scrollbar-thumb, #torrentList::-webkit-scrollbar-thumb, #trackerInput::-webkit-scrollbar-thumb { background-color: #a0aec0; border-radius: 4px; }
-        #statusLog::-webkit-scrollbar-track, #torrentList::-webkit-scrollbar-track, #trackerInput::-webkit-scrollbar-track { background-color: #edf2f7; }
-        .btn-potplayer { background-color: #4b3279; color: white; } .btn-potplayer:hover { background-color: #5d3f99; }
-        .btn-stream { background-color: #8B5CF6; color: white; } .btn-stream:hover { background-color: #7C3AED; }
-        .btn-rdpage { background-color: #3B82F6; color: white; } .btn-rdpage:hover { background-color: #2563EB; }
-        .btn-download { background-color: #10B981; color: white; } .btn-download:hover { background-color: #059669; }
-        .btn-link { background-color: #6B7280; color: white; } .btn-link:hover { background-color: #4B5563; }
-        .btn-hide { background-color: #9CA3AF; color: white; } .btn-hide:hover { background-color: #6B7280; }
-        .btn-delete { background-color: #EF4444; color: white; } .btn-delete:hover { background-color: #DC2626; }
-        .loading { animation: spin 1s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-    </style>
-    <script defer src="https://cloud.umami.is/script.js" data-website-id="55a026b0-94ff-4331-abac-cf9edd7b9ffc"></script>
+script-src 'self' 'unsafe-inline' https://cloud.umami.is;">
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" integrity="sha384-HtMZLkYo+pR5/u7zCzXxMJP6QoNnQJt1qkHM0EaOPvGDIzaVZbmYr/TlvUZ/sKAg" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous" />
+<style>
+  :root{
+    --bg:#f3f4f6; --card:#fff; --line:#e5e7eb; --ink:#111827; --muted:#6b7280;
+    --blue:#2563eb; --blue-d:#1d4ed8; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 12px rgba(16,24,40,.05);
+    --topcard:170px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Malgun Gothic","Apple SD Gothic Neo",sans-serif;font-size:14px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin:0 auto;padding:18px 18px 34px}
+  .top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .top h1{font-size:17px;margin:0;letter-spacing:-.2px}
+  .tag{font-size:11px;color:#6b7280;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-variant-numeric:tabular-nums}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch}
+  .col{display:flex;flex-direction:column;gap:16px;min-width:0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+
+  /* 접기 헤더(좁은 화면 전용) */
+  .c-head{display:none;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;cursor:pointer;
+    font-weight:700;font-size:12.5px;user-select:none}
+  .c-head .c-right{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:600;color:#9ca3af}
+  .c-head .caret{width:14px;height:14px;color:#9ca3af;transition:.15s}
+  .card.collapsed .c-head .caret{transform:rotate(-90deg)}
+
+  /* 상단 카드(좌우 같은 높이) */
+  .folders-card{height:var(--topcard);padding:12px 12px 10px;display:flex;flex-direction:column;flex:0 0 auto}
+  .up{height:var(--topcard);padding:14px;display:flex;flex-direction:column;flex:0 0 auto}
+
+  .folders{display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;padding:2px 2px 6px;scrollbar-width:thin;cursor:grab;user-select:none;flex:1 1 auto;min-height:0;align-items:flex-start}
+  .folders.dragging{cursor:grabbing}
+  .folders::-webkit-scrollbar{height:8px}
+  .folders::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:999px}
+  .folder{flex:0 0 auto;width:104px;height:92px;border:1px solid var(--line);border-radius:10px;background:#fff;
+    display:flex;flex-direction:column;justify-content:space-between;padding:9px 10px;cursor:pointer;transition:.15s;position:relative}
+  .folder:hover{border-color:#cbd5e1;transform:translateY(-1px);box-shadow:0 2px 8px rgba(16,24,40,.07)}
+  .folder.sel{border-color:currentColor;box-shadow:0 0 0 2px color-mix(in srgb, currentColor 22%, transparent)}
+  .folder .frow{display:flex;align-items:flex-start;justify-content:space-between}
+  .folder .ico{width:22px;height:22px;color:currentColor}
+  .folder .cnt{font-size:11px;color:#9ca3af;font-variant-numeric:tabular-nums}
+  .folder .nm{font-size:13px;font-weight:600;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .folder .nm input{width:100%;font:inherit;border:1px solid #93c5fd;border-radius:5px;padding:1px 4px;outline:none;background:#fff}
+
+  .fa-actions{display:flex;gap:8px;padding:4px 2px 0;flex-wrap:wrap;flex:0 0 auto}
+  .btn{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border-radius:8px;border:1px solid var(--line);
+    background:#fff;color:#374151;font-size:12.5px;font-weight:600;cursor:pointer;transition:.15s;white-space:nowrap}
+  .btn:hover{background:#f9fafb;border-color:#d1d5db}
+  .btn svg{width:15px;height:15px}
+  .btn.active{border-color:#bfdbfe;background:#eff6ff;color:#1d4ed8}
+  .tag:empty{display:none}
+  .fx-hint{flex:1 1 100%;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:12px;height:88px}
+
+  /* 목록 */
+  .list-card{flex:1 1 auto;display:flex;flex-direction:column;min-height:320px}
+  .list-head{display:flex;align-items:center;gap:10px;padding:10px 14px;min-height:50px;
+    color:#111827;background:#f9fafb;border-bottom:1px solid var(--line);transition:background .5s,color .3s;flex:0 0 auto}
+  .list-head.on-folder{color:#fff;border-bottom-color:transparent}
+  .lt{display:flex;align-items:baseline;gap:8px;min-width:0;flex:1 1 auto}
+  .lt h2{margin:0;font-size:14.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 1px rgba(0,0,0,.14)}
+  .lt .sub{font-size:11.5px;font-weight:700;opacity:.9;white-space:nowrap;text-shadow:0 1px 1px rgba(0,0,0,.12)}
+  .lt-sel{font-size:11px;font-weight:700;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px;text-shadow:0 1px 1px rgba(0,0,0,.12)}
+
+  .lt-tools{display:flex;align-items:center;gap:5px;flex:0 0 auto}
+  .sep{width:1px;height:18px;background:currentColor;opacity:.28;margin:0 3px}
+  .hbtn{position:relative;width:28px;height:28px;border-radius:7px;display:grid;place-items:center;cursor:pointer;
+    background:rgba(255,255,255,.94);border:1px solid rgba(255,255,255,.75);color:#1f2937;
+    box-shadow:0 1px 3px rgba(16,24,40,.28);transition:.14s}
+  .hbtn svg{width:16px;height:16px;stroke-width:2.3}
+  .hbtn:hover{background:#fff;transform:translateY(-1px);box-shadow:0 2px 6px rgba(16,24,40,.32)}
+  .hbtn.disabled{opacity:.45;box-shadow:none}
+  .hbtn.disabled:hover{transform:none;background:rgba(255,255,255,.94)}
+  .list-head:not(.on-folder) .hbtn{background:#fff;border-color:var(--line);color:#6b7280;box-shadow:none}
+  .list-head:not(.on-folder) .hbtn:hover{background:#f3f4f6;border-color:#d1d5db;color:#111827}
+
+  .hbtn::after{content:attr(data-tip);position:absolute;top:34px;left:50%;transform:translateX(-50%) translateY(-2px);
+    background:rgba(17,24,39,.94);color:#fff;font-size:11px;font-weight:600;line-height:1.2;padding:5px 8px;border-radius:6px;
+    white-space:nowrap;opacity:0;pointer-events:none;transition:.12s;z-index:30}
+  .hbtn::before{content:"";position:absolute;top:29px;left:50%;transform:translateX(-50%);border:4px solid transparent;
+    border-bottom-color:rgba(17,24,39,.94);opacity:0;transition:.12s;z-index:30}
+  .hbtn:hover::after,.hbtn:focus-visible::after{opacity:1;transform:translateX(-50%) translateY(0)}
+  .hbtn:hover::before,.hbtn:focus-visible::before{opacity:1}
+  .hbtn:nth-last-child(-n+2)::after{left:auto;right:0;transform:translateY(-2px)}
+  .hbtn:nth-last-child(-n+2):hover::after{transform:translateY(0)}
+  .hbtn:nth-last-child(-n+2)::before{left:auto;right:10px;transform:none}
+
+  .rows{flex:1 1 auto;overflow:auto;min-height:0}
+  .row{padding:10px 14px;border-bottom:1px solid #f1f2f4;display:flex;gap:10px;align-items:center;cursor:pointer;border-left:3px solid transparent}
+  .row:last-child{border-bottom:0}
+  .row:hover{background:#fbfcfd}
+  .row.picked{background:#eff6ff;border-left-color:var(--blue)}
+  .rmain{flex:1;min-width:0;overflow:hidden}
+  .rname{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rmeta{display:flex;gap:12px;margin-top:3px;font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .badge{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:999px;white-space:nowrap}
+  .b-wait{background:#fef3c7;color:#92400e}
+  .b-queue{background:#e5e7eb;color:#374151}
+  .b-down{background:#dbeafe;color:#1e40af}
+  .b-done{background:#d1fae5;color:#065f46}
+  .b-err{background:#fee2e2;color:#991b1b}
+  .rprog{height:3px;background:#eef0f3;border-radius:999px;margin-top:7px;overflow:hidden}
+  .rprog i{display:block;height:100%;background:var(--blue);border-radius:999px}
+  .racts{display:flex;gap:6px;align-items:center;flex:0 0 auto}
+  .menu{height:28px;border-radius:7px;border:1px solid var(--line);background:#fff;font-size:11.5px;color:#4b5563;padding:0 6px;max-width:96px;cursor:pointer}
+  .empty{padding:46px 16px;text-align:center;color:#9ca3af;font-size:12.5px}
+  .empty b{display:block;color:#6b7280;font-size:13px;margin-bottom:4px}
+
+  /* 업로드 */
+  .up-box{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;
+    padding:9px 11px 7px;background:#fff;transition:.15s}
+  .up-box:focus-within{border-color:#93c5fd;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+  .up-box textarea{flex:1 1 auto;min-height:0;width:100%;border:0;outline:none;background:transparent;resize:none;
+    padding:0;font:inherit;font-size:13px;color:var(--ink)}
+  .up-box textarea::placeholder{color:#9ca3af}
+  .up-note{font-size:11px;color:#9ca3af;line-height:1.4;flex:0 0 auto;margin-top:4px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+  .up-note b{color:#6b7280;font-weight:600}
+  .btn-primary{margin-top:12px;width:100%;height:40px;border:0;border-radius:10px;background:var(--blue);color:#fff;
+    font-size:13.5px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+    box-shadow:0 1px 2px rgba(37,99,235,.35);flex:0 0 auto}
+  .btn-primary:hover{background:var(--blue-d)}
+  .btn-primary svg{width:17px;height:17px}
+  .btn-primary:disabled{opacity:.6;cursor:not-allowed}
+
+  /* API */
+  .api{padding:0;flex:0 0 auto}
+  .api-head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer}
+  .api-head b{font-size:13px}
+  .api-status{font-size:11.5px;color:#9ca3af;display:flex;align-items:center;gap:6px}
+  .api-status.on{color:#047857;font-weight:700}
+  .api-status.err{color:#b91c1c;font-weight:700}
+  .api-body{padding:0 14px 13px;display:none}
+  .api.open .api-body{display:block}
+  .api-row{display:flex;gap:8px}
+  .api input{flex:1;height:36px;border:1px solid var(--line);border-radius:8px;padding:0 10px;font-size:12.5px;outline:none;min-width:0}
+  .api input:focus{border-color:#93c5fd;box-shadow:0 0 0 3px rgba(37,99,235,.10)}
+  .api .btn{height:36px}
+  .api-hint{margin-top:7px;font-size:11px;color:#9ca3af;line-height:1.5}
+  .caret{width:14px;height:14px;transition:.15s;color:#9ca3af}
+  .api.open .caret{transform:rotate(180deg)}
+
+  /* 트래커 / 로그 */
+  .tc-head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--line)}
+  .tc-left{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px}
+  .tc-left svg{width:16px;height:16px;color:#7c3aed}
+  .tc-meta{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .tc-body{padding:10px 14px 14px}
+  .tc-row{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);margin-bottom:7px}
+  .tc-row .ok{color:#10b981;font-weight:700}
+  .tc-row button{border:0;background:transparent;color:#2563eb;font-weight:700;font-size:11.5px;cursor:pointer;padding:0}
+  .ta{width:100%;height:92px;resize:vertical;border:1px solid var(--line);border-radius:9px;padding:9px 10px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;line-height:1.55;color:#374151;outline:none;background:#fff}
+  .ta:focus{border-color:#93c5fd}
+  .log-card{padding:11px 14px;flex:0 0 auto;max-height:126px;overflow:auto}
+  .log-card h3{margin:0 0 8px;font-size:12.5px}
+  .log{font-size:11.5px;line-height:1.7;color:#4b5563}
+  .log div{display:flex;gap:7px}
+  .log time{color:#9ca3af;font-variant-numeric:tabular-nums}
+  .log .e{color:#b91c1c}
+  .log .s{color:#047857}
+  .log .w{color:#b45309}
+
+  .note{margin-top:14px;font-size:11.5px;color:#9ca3af;text-align:center}
+
+  #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(10px);z-index:80;
+    background:rgba(17,24,39,.94);color:#fff;font-size:12.5px;font-weight:700;padding:10px 16px;border-radius:9px;
+    opacity:0;pointer-events:none;transition:.18s;box-shadow:0 8px 24px rgba(16,24,40,.28);max-width:88vw;text-align:center}
+  #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  .ctx{position:fixed;z-index:50;background:#fff;border:1px solid var(--line);border-radius:9px;box-shadow:0 8px 24px rgba(16,24,40,.16);
+    padding:5px;min-width:132px;display:none}
+  .ctx button{display:flex;width:100%;align-items:center;gap:8px;border:0;background:transparent;border-radius:6px;
+    padding:7px 9px;font:inherit;font-size:12.5px;color:#374151;cursor:pointer;text-align:left}
+  .ctx button:hover{background:#f3f4f6}
+  .ctx button.del{color:#b91c1c}
+
+  /* 링크 목록 모달 */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:70;display:flex;align-items:center;justify-content:center;padding:16px}
+  .modal .box{background:#fff;border-radius:12px;box-shadow:0 24px 60px rgba(16,24,40,.4);max-width:760px;width:100%;
+    max-height:86vh;display:flex;flex-direction:column;overflow:hidden}
+  .modal .mh{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .modal h3{margin:0;font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .modal .mb{padding:10px 16px;overflow:auto}
+  .modal .mf{padding:12px 16px;border-top:1px solid var(--line);display:flex;justify-content:flex-end}
+  .fli{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f1f2f4;font-size:12.5px}
+  .fli:last-child{border-bottom:0}
+  .fli .p{flex:1;min-width:0;word-break:break-all}
+  .fli .sz{color:#9ca3af;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .fli a,.fli button{flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:7px;padding:5px 9px;
+    font-size:11.5px;font-weight:700;color:#374151;cursor:pointer;text-decoration:none}
+  .fli a:hover,.fli button:hover{background:#f9fafb}
+
+  body.touch .hbtn[data-act="pot"]{display:none}
+  @media (pointer:coarse){ .hbtn[data-act="pot"]{display:none} }
+
+  @media (max-width:900px){
+    .grid{grid-template-columns:1fr;gap:10px}
+    .col{display:contents}
+    .up{order:1;height:auto}
+    .folders-card{order:2;height:auto;min-height:0}
+    .list-card{order:3;min-height:0}
+    .tc-card{order:4}
+    .log-card{order:5}
+    .api{order:6}
+
+    .c-head{display:flex}
+    .card.collapsed .c-body{display:none}
+    .card.collapsed{box-shadow:none;padding:0}
+    .card.collapsed .c-head{padding:8px 12px}
+
+    .folders{flex:0 0 auto;max-height:none;padding-bottom:8px}
+    .rows{max-height:none}
+    .up-box{min-height:96px}
+
+    .list-head{flex-wrap:wrap;row-gap:6px;padding:10px 12px}
+    .lt{flex:1 1 100%}
+    .lt-sel{display:none}
+    .lt-tools{width:100%;justify-content:flex-end}
+    .hbtn{width:30px;height:30px}
+    .sep{height:16px}
+    .rmeta{gap:8px}
+    .rmeta span{white-space:nowrap}
+  }
+</style>
+<script defer src="https://cloud.umami.is/script.js" data-website-id="55a026b0-94ff-4331-abac-cf9edd7b9ffc"></script>
+<script src="cordova.js"></script>
+<script src="sha1.js"></script>
+<script src="bencode.js"></script>
+<script src="src/base32.js"></script>
+<script src="app.js" defer></script>
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-blue-600 to-purple-800 text-white p-4 shadow-md flex justify-between items-center sticky top-0 z-40">
-      <div><h1 class="text-2xl font-bold flex items-center"><i class="fas fa-rocket mr-3"></i>RDMex</h1></div>
-      <div id="apiListSize" class="text-right opacity-90 text-xl font-bold"></div>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1>🚀 RDMex</h1>
+    <span class="tag" id="apiListSize"></span>
+    <span class="tag" id="apiCombined"></span>
+  </div>
+
+  <div class="grid">
+    <!-- 좌 -->
+    <div class="col col-left">
+      <section class="card folders-card">
+        <div class="folders" id="folders"></div>
+        <div class="fa-actions">
+          <button class="btn" id="btnAll">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+            목록
+          </button>
+          <button class="btn" id="btnAddFolder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            폴더 추가
+          </button>
+        </div>
+      </section>
+
+      <section class="card list-card" id="listCard">
+        <div class="list-head" id="listHead">
+          <div class="lt">
+            <h2 id="listTitle">목록</h2>
+            <span class="sub" id="listSub"></span>
+            <span class="lt-sel" id="listSel"></span>
+          </div>
+          <div class="lt-tools" id="listTools">
+            <button class="hbtn" data-act="pot"      data-tip="팟플레이어로 재생"></button>
+            <button class="hbtn" data-act="stream"   data-tip="스트리밍으로 보기"></button>
+            <button class="hbtn" data-act="rd"       data-tip="RD 페이지에서 보기"></button>
+            <button class="hbtn" data-act="down"     data-tip="다운로드 링크"></button>
+            <button class="hbtn" data-act="copy"     data-tip="링크 복사"></button>
+            <span class="sep"></span>
+            <button class="hbtn" data-act="refresh"  data-tip="새로고침"></button>
+            <button class="hbtn" data-act="clean"    data-tip="완료 항목 삭제"></button>
+          </div>
+        </div>
+        <div class="rows" id="rows"></div>
+      </section>
     </div>
 
-    <!-- Main Content -->
-    <div class="container mx-auto px-4 md:px-6 py-8 max-w-7xl">
-      
-      <!-- Input Section -->
-      <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-            <!-- Left Input Column -->
-            <div class="flex flex-col gap-4 h-full">
-                <div class="flex-grow flex relative min-h-[128px]">
-                    <div id="magnetPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none transition-opacity duration-300">
-                        <i class="fas fa-magnet text-4xl text-gray-400"></i>
-                        <p class="mt-2 text-sm text-gray-600">마그넷 링크를 여기에 붙여넣으세요</p>
-                    </div>
-                    <textarea id="magnetInput" class="w-full h-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-left bg-transparent z-10"></textarea>
-                </div>
-                <button onclick="handleConvertUpload(this)" id="convertUploadButton" class="w-full px-4 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition duration-200 flex items-center justify-center text-xl">
-                    <i class="fas fa-magnet mr-3"></i> 마그넷 / 변환 업로드
-                </button>
-            </div>
-
-            <!-- Right Input Column -->
-            <div class="flex flex-col gap-4 h-full">
-                <div class="flex-grow border-2 border-dashed border-gray-300 rounded-lg p-4 text-center w-full min-h-[128px] flex flex-col justify-center items-center relative cursor-pointer" id="dropZone">
-                    <input type="file" id="torrentFile" accept=".torrent" class="hidden" />
-                    <div id="dropZoneContent" class="flex flex-col items-center justify-center h-full">
-                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400"></i>
-                        <p class="mt-2 text-sm text-gray-600">.torrent 파일을 드롭하거나 클릭하여 추가</p>
-                    </div>
-                </div>
-                <button onclick="handleDirectUpload(this)" id="directUploadButton" class="w-full px-4 py-3 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition duration-200 flex items-center justify-center text-xl opacity-50 cursor-not-allowed" disabled>
-                    <i class="fas fa-file-arrow-up mr-3"></i> 파일 직접 업로드
-                </button>
-            </div>
+    <!-- 우 -->
+    <div class="col col-right">
+      <section class="card up" id="upCard">
+        <div class="c-head" data-toggle="upCard">
+          <span>마그넷 / 토렌트 추가</span>
+          <span class="c-right"><span>펼치기</span>
+            <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+          </span>
         </div>
-      </div>
-
-      <!-- Main Section -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Left Column: Torrent List -->
-        <div class="bg-white rounded-lg shadow-lg">
-            <div class="p-4 border-b border-gray-200 flex justify-between items-center">
-                <h2 class="text-xl font-semibold text-gray-800"><i class="fas fa-list mr-2 text-blue-500"></i>토렌트 목록</h2>
-                <div class="flex gap-2">
-                    <button onclick="refreshTorrents()" class="px-3 py-1 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700" title="새로고침"><i class="fas fa-sync-alt"></i></button>
-                    <button onclick="deleteCompleted()" class="px-3 py-1 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700" title="완료된 항목 모두 삭제"><i class="fas fa-trash"></i></button>
-                </div>
-            </div>
-            <div id="torrentList" class="p-2" style="min-height: 600px; max-height: 80vh; overflow-y: auto;">
-                <p class="text-gray-500 text-center py-8">토렌트 목록을 불러오려면 새로고침 버튼을 클릭하세요.</p>
-
-                <!-- 
-                  [ 개발자 참고 ]
-                  app.js에서 각 토렌트 항목을 생성할 때 아래와 같은 구조를 사용해주세요.
-                  날짜/시간 관련 div가 완전히 제거되었습니다.
-                -->
-                <!--
-                <div class="border-b py-3 px-2">
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="font-semibold text-gray-800 text-sm break-all pr-2">신발 벗고 돌싱포맨.E205.251021.1080p.H264-F1RST.mp4</h3>
-                        <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full whitespace-nowrap">완료</span>
-                    </div>
-
-                    <div class="flex justify-between items-center text-xs text-gray-500 mb-2">
-                        <div class="flex items-center gap-x-4">
-                            <span><i class="fas fa-hdd mr-1"></i>1.43 GB</span>
-                            <span><i class="fas fa-arrow-down mr-1"></i>0 B/s</span>
-                        </div>
-                    </div>
-
-                    <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
-                        <div class="bg-blue-600 h-2 rounded-full" style="width: 100%"></div>
-                    </div>
-
-                    <div class="flex items-center justify-end gap-1.5">
-                        <button class="btn-potplayer px-2.5 py-1.5 rounded text-xs"><i class="fas fa-play"></i></button>
-                        <button class="btn-stream px-2.5 py-1.5 rounded text-xs"><i class="fas fa-desktop"></i></button>
-                        <button class="btn-rdpage px-2.5 py-1.5 rounded text-xs"><i class="fas fa-external-link-alt"></i></button>
-                        <button class="btn-download px-2.5 py-1.5 rounded text-xs"><i class="fas fa-download"></i></button>
-                        <button class="btn-link px-2.5 py-1.5 rounded text-xs"><i class="fas fa-link"></i></button>
-                        <button class="btn-hide px-2.5 py-1.5 rounded text-xs"><i class="fas fa-eye-slash"></i></button>
-                        <button class="btn-delete px-2.5 py-1.5 rounded text-xs"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
-                -->
-            </div>
+        <div class="c-body">
+          <div class="up-box">
+            <textarea id="magnetInput" placeholder="마그넷 링크를 여기에 붙여넣으세요 (여러 개는 줄바꿈)"></textarea>
+            <div class="up-note" id="upNote">트래커 결합 → RD 전달 (동일 처리)</div>
+          </div>
+          <button class="btn-primary" id="convertUploadButton">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 18V6M7 11l5-5 5 5"/></svg>
+            마그넷/토렌트 업로드
+          </button>
+          <input type="file" id="torrentFile" accept=".torrent" multiple hidden />
         </div>
+      </section>
 
-        <!-- Right Column: Controls -->
-        <div class="flex flex-col gap-8">
-          <!-- Tracker Container -->
-          <div class="bg-white rounded-lg shadow-lg p-6">
-            <div class="flex justify-between items-center mb-1 border-b pb-3">
-                <h2 class="text-xl font-semibold flex items-center text-gray-800"><i class="fas fa-satellite-dish mr-2 text-purple-500"></i>트래커</h2>
-                <div id="trackerUpdateTime" class="text-xs font-bold text-gray-500 ml-3 text-right"></div>
+      <section class="card tc-card" id="tcCard">
+        <div class="c-head" data-toggle="tcCard">
+          <span>트래커</span>
+          <span class="c-right"><span id="tcState"></span>
+            <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+          </span>
+        </div>
+        <div class="c-body">
+          <div class="tc-head">
+            <div class="tc-left">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg>
+              트래커
             </div>
-            <div class="flex items-center mt-4 mb-2">
-              <span class="cursor-pointer text-sm font-medium text-gray-700 flex items-center" onclick="fetchBestTrackers()">
-                  <i class="fas fa-sync-alt mr-2 text-purple-500"></i>최신 트래커 불러오기
-              </span>
-              <span id="trackerStatusIcon" class="ml-2"></span>
-            </div>
-            <div class="relative">
-              <textarea id="trackerInput" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="RD 추가 시 마그넷에 적용할 트래커 목록입니다. 최신 목록을 자동으로 불러옵니다..."></textarea>
-            </div>
+            <div class="tc-meta" id="trackerMeta"></div>
           </div>
-
-          <!-- Log Container -->
-          <div class="bg-white rounded-lg shadow-lg p-6 flex flex-col">
-            <h2 class="text-xl font-semibold mb-4 flex items-center text-gray-800 border-b pb-3"><i class="fas fa-info-circle mr-2 text-blue-500"></i>상태 및 로그</h2>
-            <div id="statusLog" class="bg-gray-50 rounded-lg p-3 overflow-y-auto text-sm" style="height: 200px;">
-                <p id="initialLogMessage" class="text-gray-500">준비 완료.</p>
+          <div class="tc-body">
+            <div class="tc-row"><span id="trackerStatusIcon"></span>
+              <button id="btnFetchTrackers" type="button">최신 트래커 불러오기</button>
             </div>
-          </div>
-          
-          <!-- API Container -->
-          <div class="bg-white rounded-lg shadow-lg p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-semibold flex items-center text-gray-800"><i class="fas fa-key mr-2 text-yellow-500"></i>API 설정</h2>
-                <div id="apiCombinedStatus" class="ml-3 text-sm"></div>
-            </div>
-            <div class="relative">
-                <input type="password" id="apiToken" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10" placeholder="Real-Debrid API 토큰을 입력하세요" />
-                <button id="toggleApiToken" onclick="toggleTokenVisibility()" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-700">
-                    <i id="toggleApiIcon" class="fas fa-eye"></i>
-                </button>
-            </div>
-            <p class="text-xs text-gray-500 mt-2">API 토큰은 <a href="https://real-debrid.com/apitoken" target="_blank" class="text-blue-600 underline">real-debrid.com/apitoken</a> 에서 발급받을 수 있습니다.<br/><span class="text-red-500">연결 실패 시:</span> 토큰이 정확한지, 인터넷 연결, 브라우저 확장 프로그램(광고 차단 등)을 확인해주세요.</p>
-            <div class="flex gap-4 mt-4">
-                <button onclick="saveToken()" class="flex-1 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"><i class="fas fa-save mr-2"></i>저장</button>
-                <button onclick="testConnection()" class="flex-1 px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700"><i class="fas fa-plug mr-2"></i>연결 테스트</button>
-            </div>
+            <textarea class="ta" id="trackerInput" spellcheck="false"></textarea>
           </div>
         </div>
-      </div>
+      </section>
+
+      <section class="card log-card" id="logCard">
+        <div class="c-head" data-toggle="logCard">
+          <span>상태 및 로그</span>
+          <span class="c-right"><span></span>
+            <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+          </span>
+        </div>
+        <div class="c-body">
+          <h3>상태 및 로그</h3>
+          <div class="log" id="statusLog"></div>
+        </div>
+      </section>
+
+      <section class="card api" id="apiCard">
+        <div class="api-head" id="apiHead">
+          <b>API 설정</b>
+          <span class="api-status"><span id="apiStatus">토큰 없음</span>
+            <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+          </span>
+        </div>
+        <div class="api-body">
+          <div class="api-row">
+            <input type="password" id="apiToken" placeholder="Real-Debrid API 토큰을 입력하세요" autocomplete="off" />
+            <button class="btn" id="btnSaveToken" type="button">저장</button>
+          </div>
+          <div class="api-row" style="margin-top:8px">
+            <button class="btn" id="btnTestConn" style="width:100%;justify-content:center" type="button">연결 테스트</button>
+          </div>
+          <div class="api-hint">토큰은 real-debrid.com/apitoken 에서 발급 · 토큰은 이 브라우저에만 저장됩니다</div>
+        </div>
+      </section>
     </div>
-    
-    <!-- Toast Message Container -->
-    <div id="toastContainer"></div>
+  </div>
+  <div class="note">가상폴더는 이 브라우저에만 저장되는 분류입니다. Real-Debrid의 토렌트를 삭제·이동하지 않습니다.</div>
+</div>
 
-    <!-- Local Scripts Loading Section -->
-    <script src="cordova.js"></script>
-    <script src="sha1.js"></script>
-    <script src="bencode.js"></script>
-    <script src="src/base32.js"></script>
-    
-    <!-- Main Application Script -->
-    <script src="app.js"></script>
-    
-    <!-- API Token Visibility Script -->
-    <script>
-        function toggleTokenVisibility() {
-            const apiTokenInput = document.getElementById('apiToken');
-            const toggleIcon = document.getElementById('toggleApiIcon');
-            if (apiTokenInput.type === 'password') {
-                apiTokenInput.type = 'text';
-                toggleIcon.classList.remove('fa-eye');
-                toggleIcon.classList.add('fa-eye-slash');
-            } else {
-                apiTokenInput.type = 'password';
-                toggleIcon.classList.remove('fa-eye-slash');
-                toggleIcon.classList.add('fa-eye');
-            }
-        }
-    </script>
+<div id="toast"></div>
+<div class="ctx" id="ctx">
+  <button data-act="rename">✏️ 이름 변경</button>
+  <button data-act="delete" class="del">🗑️ 폴더 삭제</button>
+</div>
+<div id="modalHost"></div>
+
+<script>
+/* 인라인 스크립트: CSP 'unsafe-inline' 유지용 최소 코드 (토큰 표시 토글 등 확장 여지) */
+window.__RD_MOBILE_HINT__ = ('ontouchstart' in window) && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+</script>
 </body>
 </html>
